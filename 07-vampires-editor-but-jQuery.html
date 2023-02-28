@@ -45,33 +45,42 @@
 </head>
 <body>
   <script>
+
     function createVampire(name) {
-      const element = $('<div>').html(`🧛‍♀️ <span class='vampire-name'>${name}</span>`);
-      element.on('click', (event) => {
-          event.stopPropagation();
-          openModalFor(element);
-        });
-      return element;
+      const element = $('<div>')
+        .html(`🧛‍♀️ <span class='vampire-name'>${name}</span>`)
+      return element[0];
     }
-
-    function openModalFor(vampire) {
-      const modal = $('<aside>').html(`
-        <h1>🧛‍♀️</h1>
-        <h2>New Vampire</h2>
-        <input id='new-vampire-name' />
-        <button id='new-vampire-create'>Create</button>
-        <button id='new-vampire-cancel'>Cancel</button>
+    function openModalFor(element) {
+      const modal = $(`
+        <aside>
+          <h1>🧛‍♀️</h1>
+          <h2>Create Vampire</h2>
+          <input placeholder='Name your new vampire...'></input>
+          <button id='create'>Create</button>
+          <button id='close'>Close</button>
+        </aside>
       `);
-      const input = modal.find('#new-vampire-name');
-      modal.find('#new-vampire-cancel').on('click', () => { modal.remove() });
-      modal.find('#new-vampire-create').on('click', () => {
-        $(createVampire(input.val())).appendTo(vampire);
-        modal.remove()
+
+      const vampireNameField = modal.find('input');
+      modal.find('#create').on('click', () => {
+        const newVampire = createVampire(vampireNameField.val())
+        $(newVampire).on('click', function(event) {
+        event.stopPropagation();
+        openModalFor($(newVampire));
+        modal.remove();
       });
-      modal.appendTo($('body'));
-      input.focus();
+        element.append(newVampire);
+        modal.remove();
+      });
+
+      modal.find('#close').on('click', () => modal.remove());
+
+      $(document.body).append(modal);
     }
 
+    // Vanilla equivalent of $(() => {});
+    // document.addEventListener('DOMContentLoaded', () => {})
     $(() => {
       $('div').on('click', function(event) {
         event.stopPropagation();
